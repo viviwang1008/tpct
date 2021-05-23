@@ -1,0 +1,16 @@
+# pycache folder:
+__pycache__/
+
+# pycharm folder:
+.idea/
+
+# jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Don't store data on repository
+data/*.mat
+data/*.np*
+data/*.txt
+
+# Unix resources
+.nfs*
