@@ -17,16 +17,16 @@ def create_test_session_signals() -> Tuple[np.ndarray, np.ndarray]:
     second_frequency = np.average(g.frequency_bands_hz[1])
     third_frequency = np.average(g.frequency_bands_hz[2])
 
-    first_signal = np.asarray([m.sin(first_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples_per_run)])
-    second_signal = np.asarray([m.sin(second_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples_per_run)])
-    third_signal = np.asarray([m.sin(third_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples_per_run)])
+    first_signal = np.asarray([m.sin(first_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples)])
+    second_signal = np.asarray([m.sin(second_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples)])
+    third_signal = np.asarray([m.sin(third_frequency * 2 * m.pi * i) for i in np.linspace(0, 3, g.num_motor_imagery_samples)])
 
-    color_signals = np.empty((3, g.num_motor_imagery_samples_per_run))
+    color_signals = np.empty((3, g.num_motor_imagery_samples))
     color_signals[0, :] = first_signal
     color_signals[1, :] = second_signal
     color_signals[2, :] = third_signal
 
-    data = np.zeros((4, g.num_channels, g.num_motor_imagery_samples_per_run))
+    data = np.zeros((4, g.num_channels_bci2000, g.num_motor_imagery_samples))
     for color_idx in range(0, 3):
         data[0, label_1_electrodes[color_idx], :] = color_signals[color_idx]
         data[1, label_2_electrodes[color_idx], :] = color_signals[color_idx]
