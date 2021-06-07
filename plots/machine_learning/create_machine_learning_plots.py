@@ -1,283 +1,473 @@
 import json
+
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def create_0419_plots():
-    files = ['../logs/fit/20210419-215934_eegA/history.txt',
-             '../logs/fit/20210419-220045_eegB/history.txt',
-             '../logs/fit/20210419-220156_eegC/history.txt',
-             '../logs/fit/20210419-220308_eegD/history.txt']
+def create_bci2000_model_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
 
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
-
-    for file in files:
-        data = json.load(open(file))
-        ax[0, 0].plot(data["accuracy"])
-        ax[1, 0].plot(data["val_accuracy"])
-        ax[0, 1].plot(data["loss"])
-        ax[1, 1].plot(data["val_loss"])
-    ax[0, 0].set_title("Accuracy")
-    ax[1, 0].set_title("Validation Accuracy")
-    ax[0, 1].set_title("Loss")
-    ax[1, 1].set_title("Validation Loss")
-
-    ax[0, 0].set_ylim([0, 1.05])
-    ax[1, 0].set_ylim([0, 1.05])
-
-    ax[1, 0].set_xlabel("Epoch")
-    ax[1, 1].set_xlabel("Epoch")
-    ax[1, 1].legend(['A', 'B', 'C', 'D'])
-
-    ax[0, 0].grid(True)
-    ax[1, 0].grid(True)
-    ax[0, 1].grid(True)
-    ax[1, 1].grid(True)
-
-    plt.savefig("04_19_accuracy_loss.png")
-
-
-def create_0419_0425_plots():
-    files0419 = ['../logs/fit/20210419-215934_eegA/history.txt',
-                 '../logs/fit/20210419-220045_eegB/history.txt',
-                 '../logs/fit/20210419-220156_eegC/history.txt',
-                 '../logs/fit/20210419-220308_eegD/history.txt']
-
-    files0425 = ['../logs/fit/20210425-105709_eegA/history.txt',
-                 '../logs/fit/20210425-105748_eegB/history.txt',
-                 '../logs/fit/20210425-105945_eegC/history.txt',
-                 '../logs/fit/20210425-110128_eegD/history.txt']
-
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
-
-    for idx, f in enumerate(files0419):
-        data = json.load(open(f))
-        ax[idx % 2, idx // 2].plot(data["accuracy"], '-r')
-        ax[idx % 2, idx // 2].plot(data["val_accuracy"], '-g')
-        ax[idx % 2, idx // 2].plot(data["loss"], '-b')
-        ax[idx % 2, idx // 2].plot(data["val_loss"], '-y')
-
-    for idx, f in enumerate(files0425):
-        data = json.load(open(f))
-        ax[idx % 2, idx // 2].plot(data["accuracy"], '--r')
-        ax[idx % 2, idx // 2].plot(data["val_accuracy"], '--g')
-        ax[idx % 2, idx // 2].plot(data["loss"], '--b')
-        ax[idx % 2, idx // 2].plot(data["val_loss"], '--y')
-
-    titles = ['A', 'B', 'C', 'D']
-    for idx in range(0, 4):
-        ax[idx % 2, idx // 2].set_title(titles[idx])
-        ax[idx % 2, idx // 2].legend(["acc", "val_acc", "loss", "val_loss",
-                                      "Dropout acc", "Dropout val_acc", "Dropout loss", "Dropout val_loss"])
-        ax[idx % 2, idx // 2].set_ylim([0, 5])
-        ax[idx % 2, idx // 2].grid(True)
-        ax[idx % 2, idx // 2].set_xlabel("epoch")
-
-    plt.savefig("04_19_25_comparison.png")
-
-
-def create_0427_0425_plots():
-    files0425 = ['../logs/fit/20210425-105709_eegA/history.txt',
-                 '../logs/fit/20210425-105748_eegB/history.txt',
-                 '../logs/fit/20210425-105945_eegC/history.txt',
-                 '../logs/fit/20210425-110128_eegD/history.txt']
-
-    files0427_bs16 = ['../logs/fit/20210427-221730_eegA/history.txt',
-                      '../logs/fit/20210427-222012_eegB/history.txt',
-                      '../logs/fit/20210427-222226_eegC/history.txt',
-                      '../logs/fit/20210427-222329_eegD/history.txt']
-
-    files0427_bs4 = ['../logs/fit/20210427-221826_eegA/history.txt',
-                     '../logs/fit/20210427-222114_eegB/history.txt',
-                     '../logs/fit/20210427-222323_eegC/history.txt',
-                     '../logs/fit/20210427-222525_eegD/history.txt']
-
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
-
-    for idx, f in enumerate(files0425):
-        data = json.load(open(f))
-        ax[idx % 2, idx // 2].plot(data["val_accuracy"], '--')
-
-    for idx, f in enumerate(files0427_bs16):
-        data = json.load(open(f))
-        ax[idx % 2, idx // 2].plot(data["val_accuracy"], '-')
-
-    for idx, f in enumerate(files0427_bs4):
-        data = json.load(open(f))
-        ax[idx % 2, idx // 2].plot(data["val_accuracy"])
-
-    titles = ['A val_acc', 'B val_acc', 'C val_acc', 'D val_acc']
-    for idx in range(0, 4):
-        ax[idx % 2, idx // 2].set_title(titles[idx])
-        ax[idx % 2, idx // 2].legend(["bs64, lr0.001", "bs16, lr0.0001", "bs4, lr0.0001"])
-        ax[idx % 2, idx // 2].set_ylim([0, 1])
-        ax[idx % 2, idx // 2].grid(True)
-        ax[idx % 2, idx // 2].set_xlabel("epoch")
-    plt.savefig("04_25_27_learning_rate.png")
-
-
-def create_loocv_plots():
-    files = ['../logs/fit/20210503-211806_eegA/history_1.txt',
-             '../logs/fit/20210503-211806_eegA/history_2.txt',
-             '../logs/fit/20210503-211806_eegA/history_3.txt',
-             '../logs/fit/20210503-211806_eegA/history_4.txt',
-             '../logs/fit/20210503-211806_eegA/history_5.txt',
-             '../logs/fit/20210503-211806_eegA/history_6.txt',
-             '../logs/fit/20210503-211806_eegA/history_7.txt',
-             '../logs/fit/20210503-211806_eegA/history_8.txt',
-             '../logs/fit/20210503-211806_eegA/history_9.txt']
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
-
-    av_accuracy = np.zeros(500)
-    av_val_accuracy = np.zeros(500)
-    av_loss = np.zeros(500)
-    av_val_loss = np.zeros(500)
-    min_len = 500
-    for f in files:
-        data = json.load(open(f))
-        av_accuracy[0:len(data["accuracy"])] += data["accuracy"]
-        av_val_accuracy[0:len(data["val_accuracy"])] += data["val_accuracy"]
-        av_loss[0:len(data["loss"])] += data["loss"]
-        av_val_loss[0:len(data["val_loss"])] += data["val_loss"]
-        min_len = np.min((min_len, len(data["accuracy"])))
-    av_accuracy /= 9
-    av_val_accuracy /= 9
-    av_loss /= 9
-    av_val_loss /= 9
-
+    base_dir = '../../logs/fit/bci2000_model_comparison/'
+    sub_dirs = ['tuned', 'eegA', 'eegB', 'eegC', 'eegD']
     quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
-    for plot_idx in range(4):
-        for f in files:
-            data = json.load(open(f))
-            ax[plot_idx % 2, plot_idx // 2].plot(data[quantities[plot_idx]])
-            ax[plot_idx % 2, plot_idx // 2].set_title(quantities[plot_idx])
-            ax[plot_idx % 2, plot_idx // 2].legend([str(x) for x in range(1, 10)])
-            ax[plot_idx % 2, plot_idx // 2].grid(True)
-    ax[0, 0].plot(av_accuracy[0:min_len], 'k', linewidth=5)
-    ax[1, 0].plot(av_val_accuracy[0:min_len], 'k', linewidth=5)
-    ax[0, 1].plot(av_loss[0:min_len], 'k', linewidth=5)
-    ax[1, 1].plot(av_val_loss[0:min_len], 'k', linewidth=5)
-    ax[1, 0].set_xlabel("epoch")
-    ax[1, 1].set_xlabel("epoch")
-    ax[0, 0].set_ylim([0, 1])
-    ax[1, 0].set_ylim([0, 1])
-    ax[0, 1].set_ylim([0, 2])
-    ax[1, 1].set_ylim([0, 12])
-    plt.savefig("05_06_loocv.png")
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for cv_run in range(1, 6):
+                file_name = base_dir + sub_dir + str(cv_run) + '/history.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 5
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2000_model_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
 
 
-def create_single_subject_plots():
-    files = ['../logs/fit/20210505-134915_eegA/history_1.txt',
-             '../logs/fit/20210505-134915_eegA/history_2.txt',
-             '../logs/fit/20210505-134915_eegA/history_3.txt',
-             '../logs/fit/20210505-134915_eegA/history_4.txt',
-             '../logs/fit/20210505-134915_eegA/history_5.txt',
-             '../logs/fit/20210505-134915_eegA/history_6.txt',
-             '../logs/fit/20210505-134915_eegA/history_7.txt',
-             '../logs/fit/20210505-134915_eegA/history_8.txt',
-             '../logs/fit/20210505-134915_eegA/history_9.txt']
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
+def create_bci2000_LSTM_model_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
 
-    av_accuracy = np.zeros(500)
-    av_val_accuracy = np.zeros(500)
-    av_loss = np.zeros(500)
-    av_val_loss = np.zeros(500)
-    min_len = 500
-    for f in files:
-        data = json.load(open(f))
-        av_accuracy[0:len(data["accuracy"])] += data["accuracy"]
-        av_val_accuracy[0:len(data["val_accuracy"])] += data["val_accuracy"]
-        av_loss[0:len(data["loss"])] += data["loss"]
-        av_val_loss[0:len(data["val_loss"])] += data["val_loss"]
-        min_len = np.min((min_len, len(data["accuracy"])))
-    av_accuracy /= 9
-    av_val_accuracy /= 9
-    av_loss /= 9
-    av_val_loss /= 9
-
+    base_dir = '../../logs/fit/bci2000_model_comparison/'
+    sub_dirs = ['tuned_LSTM', 'eegD_LSTM']
     quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
-    for plot_idx in range(4):
-        for f in files:
-            data = json.load(open(f))
-            ax[plot_idx % 2, plot_idx // 2].plot(data[quantities[plot_idx]])
-            ax[plot_idx % 2, plot_idx // 2].set_title(quantities[plot_idx])
-            ax[plot_idx % 2, plot_idx // 2].legend([str(x) for x in range(1, 10)])
-            ax[plot_idx % 2, plot_idx // 2].grid(True)
-    ax[0, 0].plot(av_accuracy[0:min_len], 'k', linewidth=5)
-    ax[1, 0].plot(av_val_accuracy[0:min_len], 'k', linewidth=5)
-    ax[0, 1].plot(av_loss[0:min_len], 'k', linewidth=5)
-    ax[1, 1].plot(av_val_loss[0:min_len], 'k', linewidth=5)
-    ax[1, 0].set_xlabel("epoch")
-    ax[1, 1].set_xlabel("epoch")
-    ax[0, 0].set_ylim([0, 1])
-    ax[1, 0].set_ylim([0, 1])
-    ax[0, 1].set_ylim([0, 2])
-    ax[1, 1].set_ylim([0, 12])
-    plt.savefig("05_06_single_subject.png")
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(80)
+            for cv_run in range(1, 6):
+                file_name = base_dir + sub_dir + str(cv_run) + '/history.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 5
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2000_LSTM_model_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
 
 
-def create_reference_plot():
-    file = '../logs/fit/20210505-180315_eegA/history.txt'
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
+def create_bci2000_image_size_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
 
-    data = json.load(open(file))
-    av_accuracy = data["accuracy"]
-    av_val_accuracy = data["val_accuracy"]
-    av_loss = data["loss"]
-    av_val_loss = data["val_loss"]
+    base_dir = '../../logs/fit/bci2000_image_size_comparison/'
 
+    sub_dirs = ['32pixel', '64pixel']
     quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
-    for plot_idx in range(4):
-        ax[plot_idx % 2, plot_idx // 2].set_title(quantities[plot_idx])
-        ax[plot_idx % 2, plot_idx // 2].grid(True)
-    ax[0, 0].plot(av_accuracy, 'k', linewidth=5)
-    ax[1, 0].plot(av_val_accuracy, 'k', linewidth=5)
-    ax[0, 1].plot(av_loss, 'k', linewidth=5)
-    ax[1, 1].plot(av_val_loss, 'k', linewidth=5)
-    ax[1, 0].set_xlabel("epoch")
-    ax[1, 1].set_xlabel("epoch")
-    ax[0, 0].set_ylim([0, 1])
-    ax[1, 0].set_ylim([0, 1])
-    ax[0, 1].set_ylim([0, 2])
-    ax[1, 1].set_ylim([0, 12])
-    plt.savefig("05_06_reference.png")
+
+    colors = ['tab:blue', 'tab:orange']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for cv_run in range(1, 6):
+                file_name = base_dir + sub_dir + str(cv_run) + '/history.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 5
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2000_image_size_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
 
 
-def create_comparison_plot_old_new_images():
-    files = ['../logs/fit/20210505-180315_eegA/history.txt',
-             '../logs/fit/20210506-094714_eegA/history.txt']
-    fig, ax = plt.subplots(2, 2)
-    fig.set_size_inches(12, 12)
+def create_bci2000_frequency_band_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
 
+    base_dir = '../../logs/fit/bci2000_frequency_band_comparison/'
+
+    sub_dirs = ['0bands', '1bands', '2bands']
     quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
-    for plot_idx in range(4):
-        for f in files:
-            data = json.load(open(f))
-            ax[plot_idx % 2, plot_idx // 2].plot(data[quantities[plot_idx]])
-            ax[plot_idx % 2, plot_idx // 2].set_title(quantities[plot_idx])
-            ax[plot_idx % 2, plot_idx // 2].legend(["old images", "new images (Fadel)"])
-            ax[plot_idx % 2, plot_idx // 2].grid(True)
-    ax[1, 0].set_xlabel("epoch")
-    ax[1, 1].set_xlabel("epoch")
-    ax[0, 0].set_ylim([0, 1])
-    ax[1, 0].set_ylim([0, 1])
-    ax[0, 1].set_ylim([0, 2])
-    ax[1, 1].set_ylim([0, 12])
-    plt.savefig("05_06_old_new_image_comparison.png")
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    Linestyles = ['solid', 'dashed']
+
+    label_names = ["8-13, 13-21, 21-30", "4-8, 8-13, 13-30", "0.5-4, 8-13, 13-30"]
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for cv_run in range(1, 6):
+                file_name = base_dir + sub_dir + str(cv_run) + '/history.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 5
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{label_names[subdir_idx]} test"
+                else:
+                    label = f"{label_names[subdir_idx]} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.25 * box.width, box.y0, box.width * 0.75, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.75, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    img_name = "bci2000_frequency_band_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def create_bci2000_class_number_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    base_dir = '../../logs/fit/bci2000_class_number_comparison/'
+    sub_dirs = ['2class', '3class', '4class']
+    quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for cv_run in range(1, 6):
+                file_name = base_dir + sub_dir + str(cv_run) + '/history.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 5
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    img_name = "bci2000_class_number_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def create_bci2aiv_model_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    base_dir = '../../logs/fit/bci2aiv_model_comparison/'
+    sub_dirs = ['tuned', 'eegA', 'eegB', 'eegC', 'eegD']
+    quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for subj_num in range(1, 10):
+                file_name = base_dir + sub_dir + str(subj_num) + f'/history_{subj_num}.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 9
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2aiv_model_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def create_bci2aiv_LSTM_model_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    base_dir = '../../logs/fit/bci2aiv_model_comparison/'
+    sub_dirs = ['tuned_LSTM', 'eegD_LSTM']
+    quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for subj_num in range(1, 10):
+                file_name = base_dir + sub_dir + str(subj_num) + f'/history_{subj_num}.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 9
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data[0:80], color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data[0:80], color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2aiv_LSTM_model_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def create_bci2aiv_image_size_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    base_dir = '../../logs/fit/bci2aiv_image_size_comparison/'
+
+    sub_dirs = ['32pixel', '64pixel']
+    quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
+
+    colors = ['tab:blue', 'tab:orange']
+    Linestyles = ['solid', 'dashed']
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for subj_num in range(1, 10):
+                file_name = base_dir + sub_dir + str(subj_num) + f'/history_{subj_num}.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 9
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{sub_dir} test"
+                else:
+                    label = f"{sub_dir} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.2 * box.width, box.y0, box.width * 0.8, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    img_name = "bci2aiv_image_size_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def create_bci2aiv_frequency_band_comparison_plot():
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    base_dir = '../../logs/fit/bci2aiv_frequency_band_comparison/'
+
+    sub_dirs = ['0bands', '1bands', '2bands']
+    quantities = ["accuracy", "val_accuracy", "loss", "val_loss"]
+
+    colors = ['tab:blue', 'tab:orange', 'tab:green']
+    Linestyles = ['solid', 'dashed']
+
+    label_names = ["8-13, 13-21, 21-30", "4-8, 8-13, 13-30", "0.5-4, 8-13, 13-30"]
+
+    for subdir_idx, sub_dir in enumerate(sub_dirs):
+        for quantity_idx in range(4):
+            data = np.zeros(150)
+            for subj_num in range(1, 10):
+                file_name = base_dir + sub_dir + str(subj_num) + f'/history_{subj_num}.txt'
+                data_dict = json.load(open(file_name))
+                data += data_dict[quantities[quantity_idx]]
+            data /= 9
+            if quantity_idx >= 2:
+                if quantity_idx % 2:
+                    label = f"{label_names[subdir_idx]} test"
+                else:
+                    label = f"{label_names[subdir_idx]} validation"
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1, label=label)
+            else:
+                ax[quantity_idx // 2].plot(data, color=colors[subdir_idx], linestyle=Linestyles[quantity_idx % 2],
+                                           linewidth=1)
+
+    fig.set_size_inches(14, 6)
+    ax[0].set_xlabel("epoch")
+    ax[1].set_xlabel("epoch")
+    ax[0].set_ylabel("accuracy")
+    ax[1].set_ylabel("loss")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    box = ax[0].get_position()
+    ax[0].set_position([box.x0 + 0.25 * box.width, box.y0, box.width * 0.75, box.height])
+    box = ax[1].get_position()
+    ax[1].set_position([box.x0, box.y0, box.width * 0.75, box.height])
+
+    ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    img_name = "bci2aiv_frequency_band_comparison.png"
+    plt.savefig(img_name)
+    crop_margins(img_name)
+
+
+def crop_margins(img_name: str) -> None:
+    img = cv2.imread(img_name)  # Read in the image and convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = 255 * (gray < 128).astype(np.uint8)  # To invert the text to white
+    coords = cv2.findNonZero(gray)  # Find all non-zero points (text)
+    x, y, w, h = cv2.boundingRect(coords)  # Find minimum spanning bounding box
+    rect = img[y:y + h, x:x + w]  # Crop the image - note we do this on the original image
+    cv2.imwrite(img_name, rect)  # Save the image
 
 
 if __name__ == "__main__":
-    # create_0419_plots()
-    # create_0419_0425_plots()
-    # create_0427_0425_plots()
-    # create_loocv_plots()
-    # create_single_subject_plots()
-    # create_reference_plot()
-    # create_comparison_plot_old_new_images()
-    pass
+    create_bci2000_model_comparison_plot()
+    create_bci2000_LSTM_model_comparison_plot()
+    create_bci2000_image_size_comparison_plot()
+    create_bci2000_frequency_band_comparison_plot()
+    create_bci2000_class_number_comparison_plot()
+    create_bci2aiv_model_comparison_plot()
+    create_bci2aiv_LSTM_model_comparison_plot()
+    create_bci2aiv_image_size_comparison_plot()
+    create_bci2aiv_frequency_band_comparison_plot()

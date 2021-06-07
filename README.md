@@ -5,9 +5,19 @@
 ### How to run
 Make sure the packages listed in "requirements.txt" are installed.
 
-Run ```python main_preprocess_data.py -p "path/to/2a of BCI Competition IV"/data/```
+To run training for [dataset 2a of BCI Competition IV](http://bnci-horizon-2020.eu/database/data-sets):
 
-Run ```python main_train.py -h```
+- ```python main_preprocess_data_bci2aiv.py -p "path/to/2a of BCI Competition IV"/data/```
+
+- ```python main_train_bci2000.py```
+
+To run training for main_train for [BCI 2000 dataset](https://physionet.org/content/eegmmidb/1.0.0/):
+
+- ```python main_preprocess_data_bci2aiv.py -p "path/to/BCI 2000/data/```
+
+- ```python main_train_bci2000.py```
+
+All ```main_*.py``` scripts use argparse. Get more information by running ```python main_*.py -h```.
 
 
 ### References
