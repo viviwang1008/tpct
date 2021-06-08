@@ -9,7 +9,7 @@ To run training for [dataset 2a of BCI Competition IV](http://bnci-horizon-2020.
 
 - ```python main_preprocess_data_bci2aiv.py -p "path/to/2a of BCI Competition IV"/data/```
 
-- ```python main_train_bci2000.py```
+- ```python main_train_bci2aiv.py```
 
 To run training for main_train for [BCI 2000 dataset](https://physionet.org/content/eegmmidb/1.0.0/):
 
