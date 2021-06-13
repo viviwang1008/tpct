@@ -1,0 +1,12 @@
+{
+    "num_classes": 4,
+    "model_name": "eegD",
+    "num_conv_filters": 16,
+    "stride": false,
+    "dropout_rate": 0.5,
+    "batch_size": 16,
+    "epochs": 80,
+    "patience": 80,
+    "k_fold": 5,
+    "output_name": "bci2000_model_comparison/eegD32/"
+}

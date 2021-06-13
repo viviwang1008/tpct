@@ -1,0 +1,11 @@
+{
+    "model_name": "eegB",
+    "num_conv_filters": 32,
+    "stride": false,
+    "dropout_rate": 0.5,
+    "batch_size": 16,
+    "epochs": 80,
+    "patience": 80,
+    "k_fold": 5,
+    "output_name": "bci2aiv_model_comparison/eegB32/"
+}
