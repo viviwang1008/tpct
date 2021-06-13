@@ -1,6 +1,5 @@
 import argparse
 import json
-import subprocess
 
 import globals as g
 from data_preprocessing.data_loader import Bci2000DataLoader
@@ -10,13 +9,11 @@ from data_preprocessing.data_preprocessor import DataPreprocessor
 
 def write_used_input_arguments(args) -> None:
     """
-    Write arguments from argparse to files and adds a git hash.
+    Write arguments from argparse to files
     """
-    git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('ascii')
     with open("data/args_bci2000_preprocess.txt", 'w') as file:
-        input_args_and_hash = vars(args)
-        input_args_and_hash["git_hash"] = git_hash
-        file.write(json.dumps(input_args_and_hash, indent=4))
+        input_args = vars(args)
+        file.write(json.dumps(input_args, indent=4))
 
 
 def main():
@@ -34,7 +31,7 @@ def main():
                         type=int,
                         help="which set of frequency bands is used",
                         choices=[0, 1, 2],
-                        default=1)
+                        default=2)
     parser.add_argument("-w", "--num_windows",
                         type=int,
                         help="number of windows to split trial into. Default = 1",
@@ -48,10 +45,6 @@ def main():
                         type=int,
                         help="number of grid points per dimension for output image. Default = 32",
                         default=32)
-    parser.add_argument("-ps", "--do_use_pseudo_channels",
-                        type=bool,
-                        help="whether to use pseudo channels at corner of image with signal value 0. Default = True",
-                        default=True)
 
     args = parser.parse_args()
     write_used_input_arguments(args)
@@ -62,7 +55,7 @@ def main():
                                          num_windows=args.num_windows,
                                          num_grid_points=args.grid_points,
                                          frequency_band_set=args.frequency_band_set,
-                                         pseudo_channels=args.do_use_pseudo_channels)
+                                         pseudo_channels=True)
     data_saver = BCI2000DataSaver()
 
     print("Starting preprocessing")

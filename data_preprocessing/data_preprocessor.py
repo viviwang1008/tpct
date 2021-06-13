@@ -55,6 +55,7 @@ class DataPreprocessor:
         montage = make_standard_montage(kind='standard_1020')
         if self.dataset == "BCI2000":
             positions_3d = np.asarray([montage.get_positions()['ch_pos'][ch_name] for ch_name in g.ch_names_bci2000])
+            positions_3d[:, 1] += 0.015  # parameter to adjust azimuthal projection
         elif self.dataset == "BCI2aIV":
             positions_3d = np.asarray([montage.get_positions()['ch_pos'][ch_name] for ch_name in g.ch_names_bci2aiv])
         else:
@@ -123,9 +124,9 @@ class DataPreprocessor:
             if np.min(channel_data) == np.max(channel_data) == 0.0:  # this should only be true in tests, not real data
                 print("all zero signal. continue")
                 continue
-            channel_data -= np.min(channel_data)
-            channel_data /= np.max(channel_data)
-            session_signals[:, channel_idx, :] = channel_data
+            mean = np.mean(channel_data)
+            std = np.std(channel_data)
+            session_signals[:, channel_idx, :] = (channel_data - mean)/std
         return session_signals
 
     def _calculate_signal_power(self, session_signals: np.ndarray) -> np.ndarray:
