@@ -7,7 +7,7 @@ python main_train_bci2000.py -o bci2000_model_comparison/eegC32S/ -m eegC -cf 32
 python main_train_bci2000.py -o bci2000_model_comparison/eegC32/ -m eegC -cf 32 --no-stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegD32S/ -m eegD -cf 32 --stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegD32/ -m eegD -cf 32 --no-stride -e 80 -p 80
-python main_train_bci2000.py -o bci2000_model_comparison/eegA32S/ -m eegA -cf 16 --stride -e 80 -p 80
+python main_train_bci2000.py -o bci2000_model_comparison/eegA16S/ -m eegA -cf 16 --stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegA16/ -m eegA -cf 16 --no-stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegB16S/ -m eegB -cf 16 --stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegB16/ -m eegB -cf 16 --no-stride -e 80 -p 80
