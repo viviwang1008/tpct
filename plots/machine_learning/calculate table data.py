@@ -22,7 +22,8 @@ def print_bci2000_model_comparison_data():
                     average_val_accuracy += val_acc
                 average_val_accuracy /= len(subject_numbers)
                 average_val_accuracy_of_last_five_values = np.max(average_val_accuracy[-10:])
-                print(f"{sub_dir + num_filter + suffix}: \t{average_val_accuracy_of_last_five_values:.3}")
+                kappa = (average_val_accuracy_of_last_five_values - 0.25) / (1 - 0.25)
+                print(f"{sub_dir + num_filter + suffix}: \t{average_val_accuracy_of_last_five_values:.3}\t{kappa:.3}")
     print("\n")
 
 
@@ -47,7 +48,8 @@ def print_bci2aiv_table_data():
                     average_val_accuracy += val_acc
                 average_val_accuracy /= len(subject_numbers)
                 average_val_accuracy_of_last_five_values = np.max(average_val_accuracy[-10:])
-                print(f"{sub_dir + num_filter + suffix}: \t{average_val_accuracy_of_last_five_values:.3}")
+                kappa = (average_val_accuracy_of_last_five_values - 0.25)/(1-0.25)
+                print(f"{sub_dir + num_filter + suffix}: \t{average_val_accuracy_of_last_five_values:.3}\t{kappa:.3}")
     print("\n")
 
 
