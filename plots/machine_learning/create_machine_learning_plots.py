@@ -166,9 +166,9 @@ if __name__ == "__main__":
                                                img_name="bci2000_LSTM_comparison.png")
 
     base_dir = '../../logs/fit/bci2000_dropout_comparison/'
-    sub_dirs = ['eegA0.1/', 'eegA0.5/']
+    sub_dirs = ['eegA0.1/', 'eegA0.5/', 'eegA0.9/']
     create_bci2000_averaged_cv_comparison_plot(dirs=[f"{base_dir}{sub_dir}" for sub_dir in sub_dirs],
-                                               names=['dropout 0.1', 'dropout 0.5'],
+                                               names=['dropout 0.1', 'dropout 0.5', 'dropout 0.9'],
                                                img_name="bci2000_dropout_comparison.png")
 
     dirs = ['../../logs/fit/bci2000_class_number_comparison/2class/',
@@ -185,8 +185,20 @@ if __name__ == "__main__":
                                                names=["8-13, 13-21, 21-30", "4-8, 8-13, 13-30", "0.5-4, 8-13, 13-30"],
                                                img_name="bci2000_frequency_band_comparison.png")
 
+    dirs = ['../../logs/fit/bci2000_model_comparison/eegA32S/',
+            '../../logs/fit/bci2000_image_size_comparison/64pixel/']
+    create_bci2000_averaged_cv_comparison_plot(dirs=dirs,
+                                               names=["32 pixel", "64 pixel"],
+                                               img_name="bci2000_image_size_comparison.png")
+
     base_dir = '../../logs/fit/bci2aiv_model_comparison/'
     sub_dirs = ['eegA32/', 'eegB32/', 'eegC32/', 'eegD32/']
     create_bci2aiv_averaged_plot(dirs=[f"{base_dir}{sub_dir}" for sub_dir in sub_dirs],
                                  names=['eegA', 'eegB', 'eegC', 'eegD'],
                                  img_name="bci2aiv_model_32filter_stride_comparison.png")
+
+    base_dir = '../../logs/fit/bci2aiv_model_comparison/'
+    sub_dirs = ['eegA32S/', 'eegA_LSTM/', 'eegD32S/', 'eegD_LSTM/', ]
+    create_bci2aiv_averaged_plot(dirs=[f"{base_dir}{sub_dir}" for sub_dir in sub_dirs],
+                                 names=['eegA', 'eegA_LSTM', 'eegD', 'eegD_LSTM'],
+                                 img_name="bci2aiv_LSTM_comparison.png")
