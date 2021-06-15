@@ -1,0 +1,12 @@
+{
+    "num_classes": 4,
+    "model_name": "eegA",
+    "num_conv_filters": 32,
+    "stride": true,
+    "dropout_rate": 0.9,
+    "batch_size": 16,
+    "epochs": 80,
+    "patience": 80,
+    "k_fold": 5,
+    "output_name": "bci2000_dropout_comparison/eegA0.9/"
+}
