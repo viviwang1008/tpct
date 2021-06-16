@@ -45,6 +45,9 @@ def main():
                         type=int,
                         help="number of grid points per dimension for output image. Default = 32",
                         default=32)
+    parser.add_argument('--randomize_channel_locations', dest='randomize_channel_locations', help="Whether channel coordinates should be shuffled",
+                        action='store_true')
+    parser.set_defaults(randomize_channel_locations=False)
 
     args = parser.parse_args()
     write_used_input_arguments(args)
@@ -55,7 +58,8 @@ def main():
                                          num_windows=args.num_windows,
                                          num_grid_points=args.grid_points,
                                          frequency_band_set=args.frequency_band_set,
-                                         pseudo_channels=True)
+                                         pseudo_channels=True,
+                                         randomize_channel_locations=args.randomize_channel_locations)
     data_saver = BCI2000DataSaver()
 
     print("Starting preprocessing")

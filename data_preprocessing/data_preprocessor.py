@@ -37,12 +37,13 @@ class DataPreprocessor:
     """
 
     def __init__(self, num_windows: int, num_grid_points: int, pseudo_channels: bool,
-                 frequency_band_set: int, dataset: str):
+                 frequency_band_set: int, dataset: str, randomize_channel_locations: bool = False):
         self.dataset = dataset
         self.num_windows = num_windows
         self.num_grid_points = num_grid_points
         self.frequency_band_set = frequency_band_set
         self.pseudo_channels = pseudo_channels
+        self.randomize = randomize_channel_locations
         self.channel_coordinates = self._calculate_2d_channel_coordinates()
         self.x_image, self.y_image = self._calculate_image_coordinates()
 
@@ -52,6 +53,11 @@ class DataPreprocessor:
         using azimuthal projection.
         :return: coordinates. numpy ndarray of shape (num_channels, 2)
         """
+
+        if self.randomize:
+            np.random.seed(42)
+            np.random.shuffle(g.ch_names_bci2000)
+
         montage = make_standard_montage(kind='standard_1020')
         if self.dataset == "BCI2000":
             positions_3d = np.asarray([montage.get_positions()['ch_pos'][ch_name] for ch_name in g.ch_names_bci2000])

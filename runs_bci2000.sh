@@ -1,3 +1,6 @@
+python main_preprocess_data_bci2000.py -w 1 -p /scratch/sem21f18/ --randomize_channel_locations
+python main_train_bci2000.py -o bci2000_model_comparison/eegA32S/ -m eegA -cf 32 --stride -e 80 -p 80
+
 python main_preprocess_data_bci2000.py -w 1 -p /scratch/sem21f18/
 python main_train_bci2000.py -o bci2000_model_comparison/eegA32S/ -m eegA -cf 32 --stride -e 80 -p 80
 python main_train_bci2000.py -o bci2000_model_comparison/eegA32/ -m eegA -cf 32 --no-stride -e 80 -p 80
