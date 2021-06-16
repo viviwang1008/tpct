@@ -202,3 +202,10 @@ if __name__ == "__main__":
     create_bci2aiv_averaged_plot(dirs=[f"{base_dir}{sub_dir}" for sub_dir in sub_dirs],
                                  names=['eegA', 'eegA_LSTM', 'eegD', 'eegD_LSTM'],
                                  img_name="bci2aiv_LSTM_comparison.png")
+
+    dirs = ['../../logs/fit/bci2000_model_comparison/eegA32S/',
+            '../../logs/fit/bci2000_image_scrambled/']
+    names = ['regular', 'shuffled']
+    create_bci2000_averaged_cv_comparison_plot(dirs=dirs,
+                                               names=names,
+                                               img_name="bci2000_channel_location_comparison.png")
